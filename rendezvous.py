@@ -45,7 +45,7 @@ def read_graph(filename, is_directed):
     return graph, alice_start, bob_start
 
 def find_meeting_path(graph, start_a, start_b):
-    # Κάνουμε BFS κρατώντας την κατάσταση (θέση Alice, θέση Bob)
+
     queue = deque([(start_a, start_b)])
     visited = {(start_a, start_b)}
     parent = {(start_a, start_b): None}
@@ -55,12 +55,12 @@ def find_meeting_path(graph, start_a, start_b):
     while queue:
         curr_a, curr_b = queue.popleft()
         
-        # Αν έπεσαν στον ίδιο κόμβο, σταματάμε
+        
         if curr_a == curr_b:
             meeting_state = (curr_a, curr_b)
             break
             
-        # Βρίσκουμε τις επόμενες πιθανές θέσεις και για τους δύο
+        
         for next_a in graph.adj[curr_a]:
             for next_b in graph.adj[curr_b]:
                 next_state = (next_a, next_b)
@@ -72,7 +72,7 @@ def find_meeting_path(graph, start_a, start_b):
     if meeting_state is None:
         return None
         
-    # Φτιάχνουμε το μονοπάτι πηγαίνοντας προς τα πίσω
+    
     path = []
     curr = meeting_state
     while curr is not None:
