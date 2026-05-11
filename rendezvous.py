@@ -1,4 +1,5 @@
 import sys
+from collections import deque
 
 class Graph:
     def __init__(self, num_nodes, is_directed=False):
@@ -43,6 +44,59 @@ def read_graph(filename, is_directed):
 
     return graph, alice_start, bob_start
 
+def find_meeting_path(graph, start_a, start_b):
+    # Κάνουμε BFS κρατώντας την κατάσταση (θέση Alice, θέση Bob)
+    queue = deque([(start_a, start_b)])
+    visited = {(start_a, start_b)}
+    parent = {(start_a, start_b): None}
+    
+    meeting_state = None
+    
+    while queue:
+        curr_a, curr_b = queue.popleft()
+        
+        # Αν έπεσαν στον ίδιο κόμβο, σταματάμε
+        if curr_a == curr_b:
+            meeting_state = (curr_a, curr_b)
+            break
+            
+        # Βρίσκουμε τις επόμενες πιθανές θέσεις και για τους δύο
+        for next_a in graph.adj[curr_a]:
+            for next_b in graph.adj[curr_b]:
+                next_state = (next_a, next_b)
+                if next_state not in visited:
+                    visited.add(next_state)
+                    parent[next_state] = (curr_a, curr_b)
+                    queue.append(next_state)
+                    
+    if meeting_state is None:
+        return None
+        
+    # Φτιάχνουμε το μονοπάτι πηγαίνοντας προς τα πίσω
+    path = []
+    curr = meeting_state
+    while curr is not None:
+        path.append(curr)
+        curr = parent[curr]
+    path.reverse()
+    
+    return path
+
+def print_path(path):
+    for t, (a, b) in enumerate(path):
+        print(f"{t}: Alice at {a}, Bob at {b}")
+        
+    meeting_node = path[-1][0]
+    meeting_time = len(path) - 1
+    print(f"Meeting at node {meeting_node} at time step {meeting_time}.")
+
 if __name__ == "__main__":
     filename, is_directed = parse_arguments()
     graph, alice_start, bob_start = read_graph(filename, is_directed)
+    
+    path = find_meeting_path(graph, alice_start, bob_start)
+    
+    if path:
+        print_path(path)
+    else:
+        print("No meeting is possible.")
